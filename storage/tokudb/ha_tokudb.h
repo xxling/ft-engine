@@ -628,6 +628,7 @@ public:
 
 // MariaDB MRR introduced in 5.5
 #ifdef MARIADB_BASE_VERSION
+#if 50500 <= MYSQ_VERSION_ID && MSYQL_VERSION_ID <= 50599
     int multi_range_read_init(RANGE_SEQ_IF* seq,
                               void* seq_init_param,
                               uint n_ranges, uint mode,
@@ -642,6 +643,7 @@ public:
                                   uint *flags, COST_VECT *cost);
     int multi_range_read_explain_info(uint mrr_mode,
                                       char *str, size_t size);
+#endif
 #endif
 
 // MariaDB MRR introduced in 5.6

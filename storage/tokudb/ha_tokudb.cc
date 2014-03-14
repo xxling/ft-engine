@@ -404,7 +404,8 @@ static inline bool do_ignore_flag_optimization(THD* thd, TABLE* table, bool opt_
 
 static inline uint get_key_parts(const KEY *key) {
 #if (50609 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 50699) || \
-    (50700 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 50799)
+    (50700 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 50799) || \
+    (100009 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 100099)
     return key->user_defined_key_parts;
 #else
     return key->key_parts;
@@ -2061,8 +2062,13 @@ int ha_tokudb::write_frm_data(DB* db, DB_TXN* txn, const char* frm_name) {
     size_t frm_len = 0;
     int error = 0;
 
+#if 100000 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 100099
+    error = table_share->read_frm_image((const uchar**)&frm_data,&frm_len);
+    if (error) { goto cleanup; }
+#else    
     error = readfrm(frm_name,&frm_data,&frm_len);
     if (error) { goto cleanup; }
+#endif
     
     error = write_to_status(db,hatoku_frm_data,frm_data,(uint)frm_len, txn);
     if (error) { goto cleanup; }
@@ -2098,8 +2104,13 @@ int ha_tokudb::verify_frm_data(const char* frm_name, DB_TXN* txn) {
     memset(&key, 0, sizeof(key));
     memset(&stored_frm, 0, sizeof(&stored_frm));
     // get the frm data from MySQL
+#if 100000 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 100099
+    error = table_share->read_frm_image((const uchar**)&mysql_frm_data,&mysql_frm_len);
+    if (error) { goto cleanup; }
+#else
     error = readfrm(frm_name,&mysql_frm_data,&mysql_frm_len);
     if (error) { goto cleanup; }
+#endif
 
     key.data = &curr_key;
     key.size = sizeof(curr_key);
