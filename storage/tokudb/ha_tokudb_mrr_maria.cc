@@ -96,8 +96,6 @@ PATENT RIGHTS GRANT:
 /**
  * Multi Range Read interface, DS-MRR calls
  */
-#if 50500 <= MYSQL_VERSION_ID && MYSQL_VERSION_ID <= 50599
-
 int ha_tokudb::multi_range_read_init(RANGE_SEQ_IF *seq, void *seq_init_param,
                                        uint n_ranges, uint mode, 
                                        HANDLER_BUFFER *buf)
@@ -137,5 +135,3 @@ int ha_tokudb::multi_range_read_explain_info(uint mrr_mode, char *str, size_t si
 {
   return ds_mrr.dsmrr_explain_info(mrr_mode, str, size);
 }
-
-#endif

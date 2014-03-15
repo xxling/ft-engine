@@ -171,6 +171,10 @@ PATENT RIGHTS GRANT:
 #define HA_CAN_WRITE_DURING_OPTIMIZE 0
 #endif
 
+#if !defined(HA_OPTION_CREATE_FROM_ENGINE)
+#define HA_OPTION_CREATE_FROM_ENGINE 0
+#endif
+
 // In older (< 5.5) versions of MySQL and MariaDB, it is necessary to 
 // use a read/write lock on the key_file array in a table share, 
 // because table locks do not protect the race of some thread closing 
