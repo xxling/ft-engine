@@ -808,6 +808,10 @@ private:
 };
 
 #if defined(MARIADB_BASE_VERSION)
+struct ha_table_option_struct {
+    uint row_format;
+};
+
 struct ha_index_option_struct {
     bool clustering;
 };

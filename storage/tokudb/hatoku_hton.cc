@@ -127,6 +127,13 @@ typedef struct savepoint_info {
 } *SP_INFO, SP_INFO_T;
 
 #if defined(MARIADB_BASE_VERSION)
+ha_create_table_option tokudb_table_options[]= {
+    HA_TOPTION_ENUM("compression", row_format,
+                    "TOKUDB_UNCOMPRESSED,TOKUDB_ZLIB,TOKUDB_QUICKLZ,"
+                    "TOKUDB_LZMA,TOKUDB_FAST,TOKUDB_SMALL", 0),
+    HA_TOPTION_END
+};
+
 ha_create_table_option tokudb_index_options[] = {
     HA_IOPTION_BOOL("clustering", clustering, 0),
     HA_IOPTION_END
@@ -401,6 +408,7 @@ static int tokudb_init_func(void *p) {
 #endif
 
 #if defined(MARIADB_BASE_VERSION)
+    tokudb_hton->table_options = tokudb_table_options;
     tokudb_hton->index_options = tokudb_index_options;
 #endif
 
