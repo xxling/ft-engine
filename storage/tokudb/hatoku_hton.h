@@ -108,11 +108,12 @@ enum srv_row_format_enum {
 };
 typedef enum srv_row_format_enum srv_row_format_t;
 
-static srv_row_format_t toku_compression_method_to_row_format(toku_compression_method method) {
+static inline srv_row_format_t toku_compression_method_to_row_format(toku_compression_method method) {
     switch (method) {
     case TOKU_NO_COMPRESSION:
         return SRV_ROW_FORMAT_UNCOMPRESSED;        
     case TOKU_ZLIB_WITHOUT_CHECKSUM_METHOD:
+    case TOKU_ZLIB_METHOD:
         return SRV_ROW_FORMAT_ZLIB;
     case TOKU_QUICKLZ_METHOD:
         return SRV_ROW_FORMAT_QUICKLZ;
@@ -124,14 +125,12 @@ static srv_row_format_t toku_compression_method_to_row_format(toku_compression_m
         return SRV_ROW_FORMAT_FAST;
     case TOKU_SMALL_COMPRESSION_METHOD:
         return SRV_ROW_FORMAT_SMALL;
-    case TOKU_ZLIB_METHOD:
-        assert(0);
     default:
         assert(0);
     }
 }
 
-static toku_compression_method row_format_to_toku_compression_method(srv_row_format_t row_format) {
+static inline toku_compression_method row_format_to_toku_compression_method(srv_row_format_t row_format) {
     switch (row_format) {
     case SRV_ROW_FORMAT_UNCOMPRESSED:
         return TOKU_NO_COMPRESSION;
@@ -195,53 +194,12 @@ static inline srv_row_format_t row_type_to_row_format(enum row_type type) {
     return SRV_ROW_FORMAT_DEFAULT;
 }
 
-static inline enum row_type toku_compression_method_to_row_type(enum toku_compression_method method) {
-    switch (method) {
-#if TOKU_INCLUDE_ROW_TYPE_COMPRESSION
-    case TOKU_NO_COMPRESSION:
-        return ROW_TYPE_TOKU_UNCOMPRESSED;
-    case TOKU_ZLIB_METHOD:
-    case TOKU_ZLIB_WITHOUT_CHECKSUM_METHOD:
-        return ROW_TYPE_TOKU_ZLIB;
-    case TOKU_QUICKLZ_METHOD:
-        return ROW_TYPE_TOKU_QUICKLZ;
-    case TOKU_LZMA_METHOD:
-        return ROW_TYPE_TOKU_LZMA;
-    case TOKU_FAST_COMPRESSION_METHOD:
-        return ROW_TYPE_TOKU_FAST;
-    case TOKU_SMALL_COMPRESSION_METHOD:
-        return ROW_TYPE_TOKU_SMALL;
-#else
-    case TOKU_ZLIB_WITHOUT_CHECKSUM_METHOD:
-#endif
-    case TOKU_DEFAULT_COMPRESSION_METHOD:
-        return ROW_TYPE_DEFAULT;
-    default:
-        assert(false);
-    }
+static inline enum row_type toku_compression_method_to_row_type(toku_compression_method method) {
+    return row_format_to_row_type(toku_compression_method_to_row_format(method));
 }
 
-static inline enum toku_compression_method row_type_to_toku_compression_method(enum row_type type) {
-    switch (type) {
-#if TOKU_INCLUDE_ROW_TYPE_COMPRESSION
-    case ROW_TYPE_TOKU_UNCOMPRESSED:
-        return TOKU_NO_COMPRESSION;
-    case ROW_TYPE_TOKU_ZLIB:
-        return TOKU_ZLIB_WITHOUT_CHECKSUM_METHOD;
-    case ROW_TYPE_TOKU_QUICKLZ:
-        return TOKU_QUICKLZ_METHOD;
-    case ROW_TYPE_TOKU_LZMA:
-        return TOKU_LZMA_METHOD;
-    case ROW_TYPE_TOKU_SMALL:
-        return TOKU_LZMA_METHOD;
-    case ROW_TYPE_TOKU_FAST:
-        return TOKU_QUICKLZ_METHOD;
-#endif
-    default:
-        DBUG_PRINT("info", ("Ignoring ROW_FORMAT not used by TokuDB, using TOKUDB_ZLIB by default instead"));
-    case ROW_TYPE_DEFAULT:
-        return TOKU_ZLIB_WITHOUT_CHECKSUM_METHOD;
-    }
+static inline toku_compression_method row_type_to_toku_compression_method(enum row_type type) {
+    return row_format_to_toku_compression_method(row_type_to_row_format(type));
 }
 
 // thread variables
@@ -474,7 +432,7 @@ static MYSQL_THDVAR_ENUM(row_format, PLUGIN_VAR_OPCMDARG,
                          "TOKUDB_LZMA, TOKUDB_FAST, TOKUDB_SMALL and TOKUDB_DEFAULT",
                          NULL, NULL, SRV_ROW_FORMAT_ZLIB, &tokudb_row_format_typelib);
 
-static srv_row_format_t get_row_format(THD *thd) {
+static inline srv_row_format_t get_row_format(THD *thd) {
     return (srv_row_format_t) THDVAR(thd, row_format);
 }
 

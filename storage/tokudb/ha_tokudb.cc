@@ -6408,11 +6408,7 @@ static toku_compression_method get_compression_method(DB *file) {
     return method;
 }
 
-#if MYSQL_VERSION_ID >= 50521
 enum row_type ha_tokudb::get_row_type(void) const {
-#else
-enum row_thype ha_tokudb::get_row_type(void) {
-#endif
     toku_compression_method compression_method = get_compression_method(share->file);
     return toku_compression_method_to_row_type(compression_method);
 }

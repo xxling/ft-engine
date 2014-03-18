@@ -760,11 +760,7 @@ public:
         DBT* key_to_compare
         );
 
-#if MYSQL_VERSION_ID >= 50521
     enum row_type get_row_type() const;
-#else
-    enum row_type get_row_type();
-#endif
 
 private:
     int read_full_row(uchar * buf);
