@@ -469,9 +469,9 @@ private:
         KEY_AND_COL_INFO* kc_info, 
         uint32_t keynr, 
         bool is_hot_index,
-        enum row_type row_type
+        toku_compression_method compression_method
         );
-    int create_main_dictionary(const char* name, TABLE* form, DB_TXN* txn, KEY_AND_COL_INFO* kc_info, enum row_type row_type);
+    int create_main_dictionary(const char* name, TABLE* form, DB_TXN* txn, KEY_AND_COL_INFO* kc_info, toku_compression_method compression_method);
     void trace_create_table_info(const char *name, TABLE * form);
     int is_index_unique(bool* is_unique, DB_TXN* txn, DB* db, KEY* key_info);
     int is_val_unique(bool* is_unique, uchar* record, KEY* key_info, uint dict_index, DB_TXN* txn);
@@ -807,7 +807,7 @@ private:
     int map_to_handler_error(int error);
 };
 
-#if defined(MARIADB_BASE_VERSION)
+#if TOKU_INCLUDE_OPTION_STRUCTS
 struct ha_table_option_struct {
     uint row_format;
 };
